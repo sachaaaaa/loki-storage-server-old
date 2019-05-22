@@ -1,9 +1,10 @@
 #include "channel_encryption.hpp"
-#include "http_connection.h"
+// #include "http_connection.h"
 #include "lokid_key.h"
-#include "service_node.h"
+// #include "service_node.h"
 #include "swarm.h"
 #include "version.h"
+#include "server.h"
 
 #include <boost/log/core.hpp>
 #include <boost/log/expressions.hpp>
@@ -15,11 +16,13 @@
 #include <iomanip>
 #include <iostream>
 #include <sstream>
+#include <fstream>
+
 #include <thread>
 #include <utility> // for std::pair
 #include <vector>
 
-using namespace service_node;
+//using namespace service_node;
 namespace po = boost::program_options;
 namespace logging = boost::log;
 
@@ -170,11 +173,15 @@ int main(int argc, char* argv[]) {
         ChannelEncryption<std::string> channel_encryption(priv);
 
         loki::lokid_key_pair_t lokid_key_pair{private_key, public_key};
-        loki::ServiceNode service_node(ioc, port, lokid_key_pair, db_location,
-                                       lokid_rpc_port);
+        // loki::ServiceNode service_node(ioc, port, lokid_key_pair, db_location,
+        //                                lokid_rpc_port);
 
         /// Should run http server
-        loki::http_server::run(ioc, ip, port, service_node, channel_encryption);
+        // loki::http_server::run(ioc, ip, port, service_node, channel_encryption);
+        loki::server s(argv[1], argv[2]);
+
+         // Run the server until stopped.
+        s.run();
 
     } catch (const std::exception& e) {
         // It seems possible for logging to throw its own exception,
