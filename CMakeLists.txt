@@ -26,7 +26,7 @@ project(storage_server)
 
 option(INTEGRATION_TEST "build for integration test" OFF)
 option(DISABLE_SNODE_SIGNATURE "Generate and verify signatures for inter-snode communication"
-    ON)
+    OFF)
 
 if (INTEGRATION_TEST)
     add_definitions(-DDISABLE_POW)

@@ -10,13 +10,15 @@ set(HEADER_FILES swarm.h
  connection_manager.h
  connection.h
  request_handler.h
- request_handler.h
- request.h
- response.h
  server.h
  router.h
  json_rpc_api.h
  client_api.h
+ message_notifier.h
+ types.h
+ snode_api.h
+ snode_push_api.h
+ snode_test_api.h
 )
 set(SRC_FILES main.cpp
  swarm.cpp
@@ -26,6 +28,11 @@ set(SRC_FILES main.cpp
  request_handler.cpp
  server.cpp
  router.cpp
+ client_api.cpp
+ json_rpc_api.cpp
+ snode_api.cpp
+ snode_push_api.cpp
+ snode_test_api.cpp
 )
 
 add_executable(httpserver ${HEADER_FILES} ${SRC_FILES})

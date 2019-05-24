@@ -1,34 +1,45 @@
 #pragma once
 
-#include "request.h"
-#include "response.h"
-#include "router.h"
-#include "client_api.h"
+#include "types.h"
 
-#include <boost/asio.hpp>
+#include <boost/beast.hpp>
+#include <boost/optional.hpp>
 
-#include <string>
 #include <functional>
+#include <memory>
+#include <string>
+#include <utility> // std::forward
+#include <vector>
 
 namespace loki {
 
 class request_handler {
-    using completion_cb_t = std::function<void()>;
   public:
-    request_handler(boost::asio::io_context&);
+    request_handler(std::string path = "/");
+    virtual ~request_handler() = default;
 
+    // non-copiable
     request_handler(const request_handler&) = delete;
     request_handler& operator=(const request_handler&) = delete;
 
-    /// Handle a request and produce a reply.
-    void handle_request(const request_t& req, response_t& rep, completion_cb_t done);
+    boost::optional<request_handler&> parse(std::string uri);
 
-  private:
-    boost::asio::io_context& io_context_;
-    
-//    router router_;
+    virtual void handle_request(connection_ptr& conn);
 
-//    client_api capi;
+    template <typename T, typename... Args>
+    request_handler& add(std::string sub_path, Args&&... args) {
+        auto sub_handler =
+            std::make_unique<T>(sub_path, std::forward<Args>(args)...);
+        sub_handlers_.push_back(std::move(sub_handler));
+        return *sub_handlers_.back();
+    }
+
+  protected:
+    virtual bool full_match(std::string uri);
+    boost::optional<std::string> partial_match(std::string uri);
+    std::string path_;
+    // multimap?
+    std::vector<std::unique_ptr<request_handler>> sub_handlers_;
 };
 
 } // namespace loki

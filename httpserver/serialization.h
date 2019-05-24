@@ -1,5 +1,7 @@
 #pragma once
 
+#include "types.h"
+
 #include <string>
 #include <vector>
 
@@ -19,6 +21,6 @@ void serialize_message(std::string& buf, const T& msg);
 template <typename T>
 std::vector<std::string> serialize_messages(const std::vector<T>& msgs);
 
-std::vector<message_t> deserialize_messages(const std::string& blob);
+std::vector<message_ptr> deserialize_messages(const std::string& blob);
 
 } // namespace loki

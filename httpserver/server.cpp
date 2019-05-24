@@ -5,12 +5,13 @@
 
 namespace loki {
 
-server::server(const std::string& address, const std::string& port)
-  : io_context_(1),
+    server::server(boost::asio::io_context& ioc, Database& db, const std::string& address, const std::string& port, Swarm& swarm)
+  : io_context_(ioc),
     signals_(io_context_),
     acceptor_(io_context_),
     connection_manager_(),
-    request_handler_(io_context_)
+    notifier_(io_context_),
+    router_(io_context_, db, notifier_, swarm)
 {
   // Register to handle the signals that indicate when the server should exit.
   // It is safe to register for the same signal multiple times in a program,
@@ -58,8 +59,21 @@ void server::do_accept()
 
         if (!ec)
         {
-          connection_manager_.start(std::make_shared<connection>(
-              std::move(socket), connection_manager_, request_handler_));
+          auto conn = std::make_shared<connection>(
+              std::move(socket), connection_manager_, router_);
+
+          conn->on_read([=](boost::system::error_code ec, int bytes_transferred) mutable {
+            if (!ec)
+            {
+                router_.handle(conn);
+            }
+            else if (ec != boost::asio::error::operation_aborted)
+            {
+              connection_manager_.stop(conn);
+            }
+          });
+
+          connection_manager_.start(conn);
         }
 
         do_accept();

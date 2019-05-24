@@ -11,7 +11,6 @@ struct sn_record_t {
 
 namespace loki {
 
-/// message as received by client
 struct message_t {
 
     std::string pub_key;

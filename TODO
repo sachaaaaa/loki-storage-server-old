@@ -1,0 +1,4 @@
+- New class `snode_comm` that makes http request to other snodes
+- swarm to have its own timer (ioc) to refresh its list of snodes/swarms
+- New class `snode_test_suite`
+- New class `service_node` that holds keypairs, provides signing/verifying,

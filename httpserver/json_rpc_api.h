@@ -1,24 +1,23 @@
 #pragma once
 
-#include "request.h"
-#include "response.h"
+#include "request_handler.h"
+#include "../external/json.hpp"
+#include "types.h"
 
-#include <boost/beast/http.hpp>
-
-#include <functional>
+#include <boost/optional.hpp>
 
 namespace loki {
 
-class json_rpc_api {
+class json_rpc_handler : public request_handler {
   public:
-    void operator()(const request_t& req, response_t& res, std::function<void()> done) {
-        if (req.method() != boost::beast::http::verb::post) {
-            res.result(boost::beast::http::status::bad_request);
-            return;
-        }
-        handle(req, res, std::move(done));
-    }
-    virtual void handle(const request_t& req, response_t& res, std::function<void()>) = 0;
+    using json = nlohmann::json;
+
+    json_rpc_handler(std::string path);
+    virtual ~json_rpc_handler() = default;
+
+    void handle_request(connection_ptr& conn) override final;
+    virtual void handle_json_rpc(connection_ptr& conn, json::iterator method_it, json::iterator params_it) = 0;
+
 };
 
 } // namespace loki

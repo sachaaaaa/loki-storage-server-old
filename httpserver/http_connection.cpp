@@ -714,30 +714,30 @@ void connection_t::process_retrieve_all() {
     response_.result(http::status::ok);
 }
 
-void connection_t::handle_wrong_swarm(const std::string& pubKey) {
-    const std::vector<sn_record_t> nodes =
-        service_node_.get_snodes_by_pk(pubKey);
+// void connection_t::handle_wrong_swarm(const std::string& pubKey) {
+//     const std::vector<sn_record_t> nodes =
+//         service_node_.get_snodes_by_pk(pubKey);
 
-    json res_body;
-    json snodes = json::array();
+//     json res_body;
+//     json snodes = json::array();
 
-    for (const auto& sn : nodes) {
-#ifdef INTEGRATION_TEST
-        snodes.push_back(std::to_string(sn.port));
-#else
-        snodes.push_back(sn.address);
-#endif
-    }
+//     for (const auto& sn : nodes) {
+// #ifdef INTEGRATION_TEST
+//         snodes.push_back(std::to_string(sn.port));
+// #else
+//         snodes.push_back(sn.address);
+// #endif
+//     }
 
-    res_body["snodes"] = snodes;
+//     res_body["snodes"] = snodes;
 
-    response_.result(http::status::misdirected_request);
-    response_.set(http::field::content_type, "application/json");
+//     response_.result(http::status::misdirected_request);
+//     response_.set(http::field::content_type, "application/json");
 
-    /// This might throw if not utf-8 endoded
-    body_stream_ << res_body.dump();
-    BOOST_LOG_TRIVIAL(info) << "Client request for different swarm received";
-}
+//     /// This might throw if not utf-8 endoded
+//     body_stream_ << res_body.dump();
+//     BOOST_LOG_TRIVIAL(info) << "Client request for different swarm received";
+// }
 
 constexpr auto LONG_POLL_TIMEOUT = std::chrono::milliseconds(20000);
 

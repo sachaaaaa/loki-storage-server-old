@@ -65,6 +65,8 @@ class Swarm {
     const std::vector<SwarmInfo>& all_swarms() const { return all_cur_swarms_; }
 
     swarm_id_t our_swarm_id() const { return cur_swarm_id_; }
+
+    std::vector<sn_record_t> get_snodes_by_pk(const std::string& pk);
 };
 
 } // namespace loki

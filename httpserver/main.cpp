@@ -5,6 +5,9 @@
 #include "swarm.h"
 #include "version.h"
 #include "server.h"
+#include "Database.hpp"
+#include "common.h"
+#include "utils.hpp"
 
 #include <boost/log/core.hpp>
 #include <boost/log/expressions.hpp>
@@ -175,10 +178,24 @@ int main(int argc, char* argv[]) {
         loki::lokid_key_pair_t lokid_key_pair{private_key, public_key};
         // loki::ServiceNode service_node(ioc, port, lokid_key_pair, db_location,
         //                                lokid_rpc_port);
-
+        Database db(ioc, db_location);
+        
+        
+        // TODO: tidy up
+        sn_record_t our_address;
+        char buf[64] = {0};
+        if (char const* dest =
+            util::base32z_encode(lokid_key_pair.public_key, buf)) {
+            our_address.address = dest;
+            our_address.address.append(".snode");
+        } else {
+            throw std::runtime_error("Could not encode our public key");
+        }
+        our_address.port = port;
+        loki::Swarm swarm{our_address};
         /// Should run http server
         // loki::http_server::run(ioc, ip, port, service_node, channel_encryption);
-        loki::server s(argv[1], argv[2]);
+        loki::server s(ioc, db, argv[1], argv[2], swarm);
 
          // Run the server until stopped.
         s.run();

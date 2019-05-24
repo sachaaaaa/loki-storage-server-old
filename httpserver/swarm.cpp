@@ -200,4 +200,20 @@ const std::vector<sn_record_t>& Swarm::other_nodes() const {
     return swarm_peers_;
 }
 
+std::vector<sn_record_t> Swarm::get_snodes_by_pk(const std::string& pk) {
+
+    swarm_id_t swarm_id = get_swarm_by_pk(all_cur_swarms_, pk);
+
+    // TODO: have get_swarm_by_pk return idx into all_swarms instead,
+    // so we don't have to find it again
+
+    for (const auto& si : all_cur_swarms_) {
+        if (si.swarm_id == swarm_id)
+            return si.snodes;
+    }
+
+    BOOST_LOG_TRIVIAL(fatal) << "Something went wrong in get_snodes_by_pk";
+
+    return {};
+}
 } // namespace loki

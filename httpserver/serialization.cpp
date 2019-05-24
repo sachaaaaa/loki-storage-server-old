@@ -2,7 +2,7 @@
 
 /// TODO: should only be aware of messages
 #include "Item.hpp"
-#include "service_node.h"
+#include "common.h"
 
 #include <boost/endian/conversion.hpp>
 #include <boost/format.hpp>
@@ -130,13 +130,13 @@ static boost::optional<uint64_t> deserialize_uint64(string_view& slice) {
     return res;
 }
 
-std::vector<message_t> deserialize_messages(const std::string& blob) {
+std::vector<message_ptr> deserialize_messages(const std::string& blob) {
 
     BOOST_LOG_TRIVIAL(trace) << "=== Deserializing ===";
 
     constexpr size_t PK_SIZE = 66; // characters in hex;
 
-    std::vector<message_t> result;
+    std::vector<message_ptr> result;
 
     string_view slice{blob};
 
@@ -189,7 +189,7 @@ std::vector<message_t> deserialize_messages(const std::string& blob) {
         BOOST_LOG_TRIVIAL(trace)
             << boost::format("pk: %1%, msg: %2%") % *pk % *data;
 
-        result.push_back({*pk, *data, *hash, *ttl, *timestamp, *nonce});
+        result.push_back(std::make_shared<message_t>(*pk, *data, *hash, *ttl, *timestamp, *nonce));
     }
 
     BOOST_LOG_TRIVIAL(trace) << "=== END ===";
